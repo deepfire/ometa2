@@ -1,0 +1,23 @@
+(in-package :ometa)
+(declaim (optimize (safety 3) (debug 3)))
+
+(defun ometa-optimize (form)
+  (case (first form)
+    ((:and  and) (let ((clauses (cdr form)))
+		  (if (null clauses)
+		      nil
+		      (if (= (length clauses) 1)
+			  (ometa-optimize (first clauses)) 
+			  (let ((remaining (loop for f in clauses when (ometa-optimize f) collect it)))
+			    (if (> (length remaining) 1)
+				`(:and ,@remaining)
+				(ometa-optimize `(and ,@remaining))))))))
+    ((:or  or) (let ((clauses (cdr form)))
+		(if (null clauses)
+		    nil
+		    (if (= (length clauses) 1)
+			(ometa-optimize (first clauses)) 
+			`(:or ,@(loop for f in clauses when (ometa-optimize f) collect it))))))
+    ((prod :rule) `(:rule ,(second form) ,(third form) ,(ometa-optimize (fourth form))))
+    ((:assign  assign) `(:assign ,(second form) ,(ometa-optimize (third form))))
+    (otherwise form)))
