@@ -130,16 +130,12 @@
 
 (defmethod token ((o ometa-parser) arg)
   (save-input o)
-;;   (if (o-fail? (ometa-apply o 'spaces nil))
-;;       (progn
-;; 	(restore-and-discard-input o)
-;; 	(return-from token o-fail)))
   (let ((str (first arg)))
     (loop for c across str
 	 when (o-fail? (ometa-apply o 'exactly (list c)))
 	 do (progn
 		(restore-and-discard-input o)
-	       (return-from token o-fail)))
+		(return-from token o-fail)))
     (discard-input o)
     str))
 
