@@ -1,5 +1,6 @@
 (in-package :ometa)
-(declaim (optimize (safety 3) (debug 3)))
+;(declaim (optimize (safety 3) (debug 3)))
+(declaim (optimize (speed 3) (debug 1) (safety 1)))
 
 (defclass ometa-input-stream () ((input-array :initarg :input-array :accessor input-array)
 				 (input-position :initform 0 :accessor input-position)
@@ -7,11 +8,11 @@
 
 (defmethod read-next ((o ometa-input-stream))
   (let ((v (aref (input-array o) (input-position o))))
-    (incf (input-position o))
+    (incf (the fixnum (input-position o)))
     v))
 
 (defmethod at-end-p ((o ometa-input-stream))
-  (= (input-position o) (length (input-array o))))
+  (= (the fixnum (input-position o)) (length (the simple-array (input-array o))) ))
 
 (defmethod mark ((o ometa-input-stream))
   (push (input-position o) (mark-stack o)))
@@ -33,9 +34,45 @@
 (defun o-fail? (x)
   (eq x o-fail))
 
+(defvar *memo-table*)
+
+(defun init-memo ()
+  (setf *memo-table* (make-hash-table :test #'equal)))
+
+
 (defmethod ometa-apply ((o ometa-prim) fun arg)
-  ; do memoization here
-  (funcall fun o arg))
+  (save-input o)
+  (if (and (null arg)
+	   (symbolp fun))
+      (let* ((key (list fun (input-position (input-stream o)) arg ))
+	     (lookup (gethash key *memo-table* :memo-lookup-failure)))
+	(if (eq lookup :memo-lookup-failure)
+	    (let ((result (funcall fun o arg)))
+	      (setf (gethash key *memo-table*) (cons result (input-position (input-stream o))))
+	      (discard-input o)
+	      result)
+	    (progn
+	      (if (not (eq (car lookup) o-fail))
+		  (setf (input-position (input-stream o)) (cdr lookup))
+		  (restore-input o))
+	      (discard-input o)
+	      (car lookup))))
+      (progn
+	(discard-input o)
+	(funcall fun o arg) )))
+
+
+(defun inspect-memo ()
+  (let ((highest-pos 0))
+      (maphash #'(lambda (key val)
+	       (destructuring-bind (result . pos) val
+		 (if (> pos highest-pos)
+		     (setf highest-pos pos))
+		 )) *memo-table*)
+      (format t "highest ~A~%" highest-pos))
+)
+
+
 
 
 (defmethod discard-input ((o ometa-prim))
@@ -128,7 +165,7 @@
       o-fail
       (read-next (input-stream o))))
 
-(defmethod token ((o ometa-parser) arg)
+(defmethod token ((o ometa-prim) arg)
   (save-input o)
   (let ((str (first arg)))
     (loop for c across str
@@ -139,7 +176,7 @@
     (discard-input o)
     str))
 
-(defmethod stringquote ((o ometa-parser) arg)
+(defmethod stringquote ((o ometa-prim) arg)
   (ometa-apply o 'token (list (coerce (list #\")  'string))))
 
 (defmethod firstAndRest ((o ometa-prim) args)
@@ -169,3 +206,4 @@
 									   #'(lambda (o arg)
 									       (ometa-apply o thing nil))))))))
 	  (cons first-rule others)))))
+

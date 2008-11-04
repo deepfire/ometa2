@@ -1,8 +1,3 @@
-(defpackage #:ometa
-  (:use :cl)
-  (:export :parse-grammar-file :compile-grammar-to-lisp :generate-parser :ometa :ometa-parser :ometa-compiler)
-  (:export :letter :digit :anything :exactly :ochar :ospace :spaces :token))
-
 (in-package :ometa)
 
 (defvar *ometa-compiler-target* 'ometa-parser)
@@ -32,6 +27,7 @@
   (load-alternate-ometa))
 
 (defun parse-grammar (file-name)
+  (init-memo)
   (let ((input (with-open-file (file file-name :direction :input)
     (let ((s (make-array (file-length file))))
       (read-sequence s file) s))))
