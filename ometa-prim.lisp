@@ -27,6 +27,31 @@
   (reset-to-mark o)
   (pop-mark o))
 
+
+(defclass ometa-list-input-stream () ((input-list :initarg :input-list :accessor input-list)
+				      (mark-stack :initform nil :accessor mark-stack)))
+
+(defmethod read-next ((o ometa-list-input-stream))
+  (let ((v (car (input-list o))))
+    (setf (input-list o) (cdr (input-list o)))
+    v))
+
+(defmethod at-end-p ((o ometa-list-input-stream))
+  (null (input-list o)))
+
+(defmethod mark ((o ometa-list-input-stream))
+  (push (input-list o) (mark-stack o)))
+
+(defmethod reset-to-mark ((o ometa-list-input-stream))
+  (setf (input-list o) (car (mark-stack o))))
+
+(defmethod pop-mark ((o ometa-list-input-stream))
+  (pop (mark-stack o)))
+
+(defmethod reset-and-pop-mark ((o ometa-list-input-stream))
+  (reset-to-mark o)
+  (pop-mark o))
+
 (defclass ometa-prim ()
   ((input-stream :accessor input-stream :initarg :input-stream)))
 
@@ -164,6 +189,23 @@
   (if (at-end-p (input-stream o))
       o-fail
       (read-next (input-stream o))))
+
+(defmethod form ((o ometa-prim) arg)
+  (let ((v (ometa-apply o 'anything nil)))
+    (if (or (o-fail? v)
+	    (not (listp v)))
+	o-fail
+	(let ((saved-input-stream (input-stream o)))
+	  (setf (input-stream o) (make-instance 'ometa-list-input-stream :input-list v))
+	  (let ((result (ometa-apply o arg nil)))
+	    (if (or (o-fail? result)
+		    (not (at-end-p (input-stream o))))
+		(progn
+		  (setf (input-stream o) saved-input-stream)
+		  o-fail)
+		(progn
+		  (setf (input-stream o) saved-input-stream)
+		  v)))))))
 
 (defmethod token ((o ometa-prim) arg)
   (save-input o)

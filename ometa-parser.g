@@ -1,7 +1,7 @@
 ometa ometa-parser <: ometa {
 nameFirst = "_":x -> <<(aref x 0)>> | "$":x -> <<(aref x 0)>> | letter,
 nameRest = nameFirst | digit | "-":x -> <<(aref x 0)>>,
-tsName = firstAndRest("nameFirst", "nameRest"):xs,
+tsName = firstAndRest("nameFirst", "nameRest"):xs -> << (coerce xs 'string)>>,
 name = spaces tsName,
 tsString = "FAIL",
 okeyword :xs = token(xs) ~letterOrDigit,
@@ -35,6 +35,7 @@ expr1 = application | semAction | semPred
       | ( okeyword("undefined") | okeyword("nil")
         | okeyword("true") | okeyword("false")):x -> << `(:app 'exactly ,x)>>
       | spaces (characters | sCharacters:s -> <<`(:app token ,s)>> | onumber)
+      | spaces "[" spaces expr:formexpr spaces "]" -> <<`(:form ,formexpr)>>
       | spaces "(" spaces expr:x spaces ")" -> x,
 ruleName = name | spaces tsString,
 rule = &(ruleName:n) spaces rulePart(n):x ("," spaces rulePart(n))*:xs -> << (prog1 `(:rule ,n ,(locals o) (:or ,x ,@xs)) (setf (locals o) nil)) >>,
