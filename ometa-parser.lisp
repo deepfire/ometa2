@@ -181,6 +181,23 @@
                                                         NIL))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     `(:STRING ,(COERCE XS 'STRING)))))))
+(DEFMETHOD OMETA::OSYMBOL ((OMETA::O OMETA:OMETA-PARSER) OMETA::ARG)
+           (LET (S)
+             (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
+                                 (LIST
+                                  (LAMBDA (OMETA::O OMETA::NULLARG)
+                                    (OMETA::OMETA-APPLY OMETA::O 'SPACES NIL))
+                                  (LAMBDA (OMETA::O OMETA::NULLARG)
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA:TOKEN
+                                                        (LIST "#")))
+                                  (LAMBDA (OMETA::O OMETA::NULLARG)
+                                    (LET ((OMETA::V
+                                           (OMETA::OMETA-APPLY OMETA::O 'TSNAME
+                                                               NIL)))
+                                      (SETF OMETA::S OMETA::V)
+                                      OMETA::V))
+                                  (LAMBDA (OMETA::O OMETA::NULLARG)
+                                    `(:APP EXACTLY (:SYMBOL ,S)))))))
 (DEFMETHOD OMETA::ONUMBER ((OMETA::O OMETA:OMETA-PARSER) OMETA::ARG)
            (LET (DS SIGN)
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
@@ -980,6 +997,12 @@
                                                                       OMETA::NULLARG)
                                                                    `(:APP TOKEN
                                                                      ,S)))))
+                                                             (LAMBDA
+                                                                 (OMETA::O
+                                                                  OMETA::NULLARG)
+                                                               (OMETA::OMETA-APPLY
+                                                                OMETA::O
+                                                                'OSYMBOL NIL))
                                                              (LAMBDA
                                                                  (OMETA::O
                                                                   OMETA::NULLARG)

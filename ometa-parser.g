@@ -7,6 +7,8 @@ tsString = "FAIL",
 okeyword :xs = token(xs) ~letterOrDigit,
 characters = "''''",
 sCharacters = stringquote (~stringquote anything)*:xs stringquote -> << `(:string ,(coerce xs 'string))>>,
+
+osymbol = spaces "#" tsName:s -> << `(:app exactly (:symbol ,s))>>,
 onumber = ("-" | empty -> ""):sign digit+:ds -> <<`(:app exactly ,(parse-integer (coerce ds 'string)))>>,
 letterOrDigit = letter | digit,
 args = "(" listof("hostExpr", ","):xs ")" -> xs | empty -> << nil >>,
@@ -34,7 +36,7 @@ expr2 = spaces "~" expr2:x -> <<`(:not ,x)>>
 expr1 = application | semAction | semPred
       | ( okeyword("undefined") | okeyword("nil")
         | okeyword("true") | okeyword("false")):x -> << `(:app 'exactly ,x)>>
-      | spaces (characters | sCharacters:s -> <<`(:app token ,s)>> | onumber)
+      | spaces (characters | sCharacters:s -> <<`(:app token ,s)>> | osymbol | onumber)
       | spaces "[" spaces expr:formexpr spaces "]" -> <<`(:form ,formexpr)>>
       | spaces "(" spaces expr:x spaces ")" -> x,
 ruleName = name | spaces tsString,
