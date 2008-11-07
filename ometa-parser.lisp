@@ -861,7 +861,7 @@
                                     (OMETA::OMETA-APPLY OMETA::O 'EXPR1
                                                         NIL))))))
 (DEFMETHOD OMETA::EXPR1 ((OMETA::O OMETA:OMETA-PARSER) OMETA::ARG)
-           (LET (FORMEXPR S X)
+           (LET (TAILEXPR FORMEXPR S X)
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OOR
                                  (LIST
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
@@ -1038,10 +1038,48 @@
                                                            (LET ((OMETA::V
                                                                   (OMETA::OMETA-APPLY
                                                                    OMETA::O
-                                                                   'EXPR NIL)))
+                                                                   'EXPRALL
+                                                                   NIL)))
                                                              (SETF OMETA::FORMEXPR
                                                                      OMETA::V)
                                                              OMETA::V))
+                                                         (LAMBDA
+                                                             (OMETA::O
+                                                              OMETA::NULLARG)
+                                                           (OMETA::OMETA-APPLY
+                                                            OMETA::O 'SPACES
+                                                            NIL))
+                                                         (LAMBDA
+                                                             (OMETA::O
+                                                              OMETA::NULLARG)
+                                                           (OMETA::OMETA-APPLY
+                                                            OMETA::O
+                                                            'OMETA::OMANY
+                                                            (LAMBDA
+                                                                (OMETA::O
+                                                                 OMETA::NULLARG)
+                                                              (OMETA::OMETA-APPLY
+                                                               OMETA::O
+                                                               'OMETA::OAND
+                                                               (LIST
+                                                                (LAMBDA
+                                                                    (OMETA::O
+                                                                     OMETA::NULLARG)
+                                                                  (OMETA::OMETA-APPLY
+                                                                   OMETA::O
+                                                                   'OMETA:TOKEN
+                                                                   (LIST "/")))
+                                                                (LAMBDA
+                                                                    (OMETA::O
+                                                                     OMETA::NULLARG)
+                                                                  (LET ((OMETA::V
+                                                                         (OMETA::OMETA-APPLY
+                                                                          OMETA::O
+                                                                          'EXPRALL
+                                                                          NIL)))
+                                                                    (SETF OMETA::TAILEXPR
+                                                                            OMETA::V)
+                                                                    OMETA::V)))))))
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
@@ -1058,8 +1096,8 @@
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
-                                                           `(:FORM
-                                                             ,FORMEXPR)))))
+                                                           `(:FORM ,FORMEXPR
+                                                             ,TAILEXPR)))))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
                                                         (LIST
@@ -1109,6 +1147,21 @@
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            X))))))))
+(DEFMETHOD OMETA::EXPRALL ((OMETA::O OMETA:OMETA-PARSER) OMETA::ARG)
+           (LET (X)
+             (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
+                                 (LIST
+                                  (LAMBDA (OMETA::O OMETA::NULLARG)
+                                    (LET ((OMETA::V
+                                           (OMETA::OMETA-APPLY OMETA::O 'EXPR
+                                                               NIL)))
+                                      (SETF OMETA::X OMETA::V)
+                                      OMETA::V))
+                                  (LAMBDA (OMETA::O OMETA::NULLARG)
+                                    (PROGN
+                                     (ASSERT (EQ (CAR X) :OR))
+                                     (ASSERT (EQ (CAR (CADR X)) :AND))
+                                     `(:AND-ALL ,@(CDADR X))))))))
 (DEFMETHOD OMETA::RULENAME ((OMETA::O OMETA:OMETA-PARSER) OMETA::ARG)
            (LET ()
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OOR

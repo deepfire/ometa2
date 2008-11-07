@@ -197,15 +197,23 @@
 	o-fail
 	(let ((saved-input-stream (input-stream o)))
 	  (setf (input-stream o) (make-instance 'ometa-list-input-stream :input-list v))
-	  (let ((result (ometa-apply o arg nil)))
+	  (let ((result (ometa-apply o (first arg) nil)))
 	    (if (or (o-fail? result)
 		    (not (at-end-p (input-stream o))))
 		(progn
 		  (setf (input-stream o) saved-input-stream)
 		  o-fail)
-		(progn
-		  (setf (input-stream o) saved-input-stream)
-		  v)))))))
+		(let ((result2 (if (null (second arg))
+				   nil
+				   (ometa-apply o (second arg) nil))))
+		  (if (or (o-fail? result2)
+			  (not (at-end-p (input-stream o))))
+		      (progn
+			(setf (input-stream o) saved-input-stream)
+			o-fail)
+		      (progn
+			(setf (input-stream o) saved-input-stream)
+			(append result result2))))))))))
 
 (defmethod token ((o ometa-prim) arg)
   (save-input o)

@@ -37,8 +37,10 @@ expr1 = application | semAction | semPred
       | ( okeyword("undefined") | okeyword("nil")
         | okeyword("true") | okeyword("false")):x -> << `(:app 'exactly ,x)>>
       | spaces (characters | sCharacters:s -> <<`(:app token ,s)>> | osymbol | onumber)
-      | spaces "[" spaces expr:formexpr spaces "]" -> <<`(:form ,formexpr)>>
+      | spaces "[" spaces exprall:formexpr spaces ("/" exprall:tailexpr)* spaces "]" -> <<`(:form ,formexpr ,tailexpr)>>
       | spaces "(" spaces expr:x spaces ")" -> x,
+
+exprall = expr:x -> << (progn (assert (eq (car x) :or)) (assert (eq (car (cadr x)) :and)) `(:and-all ,@(cdadr x))) >>,
 ruleName = name | spaces tsString,
 rule = &(ruleName:n) spaces rulePart(n):x ("," spaces rulePart(n))*:xs -> << (prog1 `(:rule ,n ,(locals o) (:or ,x ,@xs)) (setf (locals o) nil)) >>,
 rulePart :rn = ruleName:n ?<<(equal n rn)>> spaces expr4:b1 (spaces "=" spaces expr:b2 -> << `(:and ,b1 ,b2) >> | empty -> b1),
