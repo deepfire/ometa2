@@ -29,8 +29,9 @@
 (defun parse-grammar (file-name)
   (init-memo)
   (let ((input (with-open-file (file file-name :direction :input)
-    (let ((s (make-array (file-length file))))
-      (read-sequence s file) s))))
+		 (let ((s (make-array (file-length file))))
+		   (read-sequence s file)
+		   s))))
     (let ((o (make-instance 'ometa-parser :input-stream (make-instance 'ometa-input-stream :input-array input))))
       (ometa-apply o 'grammar nil))))
 

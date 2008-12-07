@@ -1,6 +1,6 @@
 ometa ometa-parser <: ometa {
 nameFirst = "_":x -> <<(aref x 0)>> | "$":x -> <<(aref x 0)>> | letter,
-nameRest = nameFirst | digit | "-":x -> <<(aref x 0)>>,
+nameRest = nameFirst | digit | ("-"|"!"):x -> <<(aref x 0)>>,
 tsName = firstAndRest("nameFirst", "nameRest"):xs -> << (coerce xs 'string)>>,
 name = spaces tsName,
 tsString = "FAIL",
