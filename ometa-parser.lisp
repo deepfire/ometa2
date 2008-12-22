@@ -60,8 +60,38 @@
                                                            (LET ((OMETA::V
                                                                   (OMETA::OMETA-APPLY
                                                                    OMETA::O
-                                                                   'OMETA:TOKEN
-                                                                   (LIST "-"))))
+                                                                   'OMETA::OOR
+                                                                   (LIST
+                                                                    (LAMBDA
+                                                                        (OMETA::O
+                                                                         OMETA::NULLARG)
+                                                                      (OMETA::OMETA-APPLY
+                                                                       OMETA::O
+                                                                       'OMETA::OAND
+                                                                       (LIST
+                                                                        (LAMBDA
+                                                                            (OMETA::O
+                                                                             OMETA::NULLARG)
+                                                                          (OMETA::OMETA-APPLY
+                                                                           OMETA::O
+                                                                           'OMETA:TOKEN
+                                                                           (LIST
+                                                                            "-"))))))
+                                                                    (LAMBDA
+                                                                        (OMETA::O
+                                                                         OMETA::NULLARG)
+                                                                      (OMETA::OMETA-APPLY
+                                                                       OMETA::O
+                                                                       'OMETA::OAND
+                                                                       (LIST
+                                                                        (LAMBDA
+                                                                            (OMETA::O
+                                                                             OMETA::NULLARG)
+                                                                          (OMETA::OMETA-APPLY
+                                                                           OMETA::O
+                                                                           'OMETA:TOKEN
+                                                                           (LIST
+                                                                            "!"))))))))))
                                                              (SETF OMETA::X
                                                                      OMETA::V)
                                                              OMETA::V))
