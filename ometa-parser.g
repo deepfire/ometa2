@@ -1,6 +1,6 @@
 ometa ometa-parser <: ometa {
-nameFirst = "_":x -> <<(aref x 0)>> | "$":x -> <<(aref x 0)>> | letter,
-nameRest = nameFirst | digit | ("-"|"!"):x -> <<(aref x 0)>>,
+nameFirst = letter,
+nameRest = nameFirst | digit | $- | $!,
 tsName = firstAndRest("nameFirst", "nameRest"):xs -> << (coerce xs 'string)>>,
 name = spaces tsName,
 tsString = "FAIL",
@@ -9,9 +9,10 @@ characters = "''''",
 sCharacters = stringquote (~stringquote anything)*:xs stringquote -> << `(:string ,(coerce xs 'string))>>,
 
 osymbol = spaces "#" tsName:s -> << `(:app exactly (:symbol ,s))>>,
+char-literal = "$" anything:d -> << `(:app exactly (:character ,d)) >>,
 onumber = ("-" | empty -> ""):sign digit+:ds -> <<`(:app exactly ,(parse-integer (coerce ds 'string)))>>,
 letterOrDigit = letter | digit,
-args = "(" listof("hostExpr", ","):xs ")" -> xs | empty -> << nil >>,
+args = $( listof("hostExpr", ","):xs $) -> xs | empty -> << nil >>,
 
 application = spaces name:rule args:as -> <<`(:app ,rule ,@as)>>,
 hostExpr = spaces (curlyHostExpr | atomicHostExpr),
@@ -36,7 +37,7 @@ expr2 = spaces "~" expr2:x -> <<`(:not ,x)>>
 expr1 = application | semAction | semPred
       | ( okeyword("undefined") | okeyword("nil")
         | okeyword("true") | okeyword("false")):x -> << `(:app 'exactly ,x)>>
-      | spaces (characters | sCharacters:s -> <<`(:app token ,s)>> | osymbol | onumber)
+      | spaces (characters | sCharacters:s -> <<`(:app token ,s)>> | char-literal | osymbol | onumber)
       | spaces "[" spaces exprall:formexpr spaces ("/" exprall:tailexpr)* spaces "]" -> <<`(:form ,formexpr ,tailexpr)>>
       | spaces "(" spaces expr:x spaces ")" -> x,
 

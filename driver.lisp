@@ -35,14 +35,6 @@
     (let ((o (make-instance 'ometa-parser :input-stream (make-instance 'ometa-input-stream :input-array input))))
       (ometa-apply o 'grammar nil))))
 
-(defun old-make-parser (class-name grammar-file-name parser-file-name )
-  (with-open-file (stream parser-file-name :direction :output :if-exists :supersede)
-    (loop for form in (mapcar #'ometa-compile (mapcar #'ometa-optimize (parse-grammar grammar-file-name))) 
-	   do (progn
-		(format stream "~%")
-		(let ((*print-readably* t))
-		  (prin1 form stream))))))
-
 (defun make-parser (class-name grammar-file-name parser-file-name )
   (let ((*ometa-compiler-target* class-name))
     (with-open-file (stream parser-file-name :direction :output :if-exists :supersede)

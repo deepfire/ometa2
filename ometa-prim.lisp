@@ -64,7 +64,6 @@
 (defun init-memo ()
   (setf *memo-table* (make-hash-table :test #'equal)))
 
-
 (defmethod ometa-apply ((o ometa-prim) fun arg)
   (save-input o)
   (if (and (null arg)

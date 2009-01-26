@@ -13,19 +13,18 @@
     ((not :not) `(ometa-apply o 'oNot (lambda (o nullarg) ,(ometa-compile (second form)))))
     ((:lookahead) `(ometa-apply o 'oNot (lambda (o nullarg) (ometa-apply o 'oNot (lambda (o nullarg) ,(ometa-compile (second form)))))))
     ((apply :apply :app) (destructuring-bind (app name . args) form
-	     `(ometa-apply o ',(if (stringp name) (intern (string-upcase name)) name) ,(if (null args)
-											   nil
-											   `(list ,@(loop for a in args
-												       collect (if (and (consp a)
-															(eq (car a) :app))
-														   (ometa-compile a)
-														   (if (and (consp a)
-															    (eq (car a) :string))
-														       (second a)
-														       (if (and (consp a)
-																(eq (car a) :symbol))
-															   (intern (second a))
-															   (intern (string-upcase a) :ometa))))))))))
+			   `(ometa-apply o
+					 ',(if (stringp name) (intern (string-upcase name)) name)
+					 ,(if (null args)
+					      nil
+					      `(list ,@(loop for a in args
+							  collect (if (consp a)
+								      (ecase (first a)
+									(:app (ometa-compile a))
+									(:string (second a))
+									(:character (second a))
+									(:symbol (intern (second a))))
+								      (intern (string-upcase a) :ometa))))))))
     ((assign :assign :set) `(let ((v ,(ometa-compile (if (equal (third form) `(:app :anything)) `(:loadarg) (third form)) )))
 			      (setf ,(intern (string-upcase (second form)) :ometa) v)
 			      v))
