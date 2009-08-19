@@ -1,6 +1,6 @@
 (defsystem "ometa"
     :author "John Leuner"
-    :description "ometa implementation for Common Lisp"
+    :description "OMeta implementation for Common Lisp"
     :serial t
     :components ((:file "package")
                  (:file "driver")
