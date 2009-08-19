@@ -1,5 +1,5 @@
 ometa ometa-parser <: ometa {
-nameFirst = letter,
+nameFirst = letter | $_,
 nameRest = nameFirst | digit | $- | $!,
 tsName = firstAndRest("nameFirst", "nameRest"):xs -> << (coerce xs 'string)>>,
 name = spaces tsName,
@@ -10,7 +10,7 @@ sCharacters = stringquote (~stringquote anything)*:xs stringquote -> << `(:strin
 
 osymbol = spaces "#" tsName:s -> << `(:app exactly (:symbol ,s))>>,
 char-literal = "$" anything:d -> << `(:app exactly (:character ,d)) >>,
-onumber = ("-" | empty -> ""):sign digit+:ds -> <<`(:app exactly ,(parse-integer (coerce ds 'string)))>>,
+onumber = ("-" | empty -> <<"">>):sign digit+:ds -> <<`(:app exactly ,(parse-integer (coerce ds 'string)))>>,
 letterOrDigit = letter | digit,
 args = $( listof("hostExpr", ","):xs $) -> xs | empty -> << nil >>,
 
@@ -45,6 +45,6 @@ exprall = expr:x -> << (progn (assert (eq (car x) :or)) (assert (eq (car (cadr x
 ruleName = name | spaces tsString,
 rule = &(ruleName:n) spaces rulePart(n):x ("," spaces rulePart(n))*:xs -> << (prog1 `(:rule ,n ,(locals o) (:or ,x ,@xs)) (setf (locals o) nil)) >>,
 rulePart :rn = ruleName:n ?<<(equal n rn)>> spaces expr4:b1 (spaces "=" spaces expr:b2 -> << `(:and ,b1 ,b2) >> | empty -> b1),
-grammar = okeyword("ometa") spaces name:n spaces ("<:" name | empty -> "OMeta"):sn spaces "{" listof("rule", ","):rs spaces "}" -> << `(:grammar ,n ,sn ,@rs) >>
+grammar = okeyword("ometa") spaces name:n spaces ("<:" name | empty -> <<"OMeta">>):sn spaces "{" listof("rule", ","):rs spaces "}" -> << `(:grammar ,n ,sn ,@rs) >>
 }
 
