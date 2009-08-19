@@ -6,15 +6,16 @@
            (LET ()
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::ONOT
                                  (LAMBDA (OMETA::O OMETA::NULLARG)
-                                   (OMETA::OMETA-APPLY OMETA::O 'ANYTHING
+                                   (OMETA::OMETA-APPLY OMETA::O 'OMETA::ANYTHING
                                                        NIL)))))
+
 (DEFMETHOD OMETA:EXACTLY ((OMETA::O OMETA:OMETA) OMETA::ARG)
            (LET (GOT WANT)
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
                                  (LIST
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (LET ((OMETA::V (POP OMETA::ARG)))
-                                      (SETF OMETA::WANT OMETA::V)
+                                      (SETF WANT OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
@@ -25,10 +26,9 @@
                                                            (LET ((OMETA::V
                                                                   (OMETA::OMETA-APPLY
                                                                    OMETA::O
-                                                                   'ANYTHING
+                                                                   'OMETA::ANYTHING
                                                                    NIL)))
-                                                             (SETF OMETA::GOT
-                                                                     OMETA::V)
+                                                             (SETF GOT OMETA::V)
                                                              OMETA::V))
                                                          (LAMBDA
                                                              (OMETA::O
@@ -41,6 +41,7 @@
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            WANT))))))))
+
 (DEFMETHOD OMETA:OCHAR ((OMETA::O OMETA:OMETA) OMETA::ARG)
            (LET (X)
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
@@ -48,8 +49,8 @@
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (LET ((OMETA::V
                                            (OMETA::OMETA-APPLY OMETA::O
-                                                               'ANYTHING NIL)))
-                                      (SETF OMETA::X OMETA::V)
+                                                               'OMETA::ANYTHING NIL)))
+                                      (SETF X OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (OMETA::OMETA-APPLY OMETA::O 'OMETA::OPRED
@@ -61,9 +62,9 @@
                                  (LIST
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (LET ((OMETA::V
-                                           (OMETA::OMETA-APPLY OMETA::O 'OCHAR
+                                           (OMETA::OMETA-APPLY OMETA::O 'OMETA::OCHAR
                                                                NIL)))
-                                      (SETF OMETA::X OMETA::V)
+                                      (SETF X OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (OMETA::OMETA-APPLY OMETA::O 'OMETA::OPRED
@@ -73,16 +74,16 @@
            (LET ()
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OMANY
                                  (LAMBDA (OMETA::O OMETA::NULLARG)
-                                   (OMETA::OMETA-APPLY OMETA::O 'OSPACE NIL)))))
+                                   (OMETA::OMETA-APPLY OMETA::O 'OMETA::OSPACE NIL)))))
 (DEFMETHOD OMETA:LETTER ((OMETA::O OMETA:OMETA) OMETA::ARG)
            (LET (X)
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
                                  (LIST
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (LET ((OMETA::V
-                                           (OMETA::OMETA-APPLY OMETA::O 'OCHAR
+                                           (OMETA::OMETA-APPLY OMETA::O 'OMETA::OCHAR
                                                                NIL)))
-                                      (SETF OMETA::X OMETA::V)
+                                      (SETF X OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (OMETA::OMETA-APPLY OMETA::O 'OMETA::OPRED
@@ -94,9 +95,9 @@
                                  (LIST
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (LET ((OMETA::V
-                                           (OMETA::OMETA-APPLY OMETA::O 'OCHAR
+                                           (OMETA::OMETA-APPLY OMETA::O 'OMETA::OCHAR
                                                                NIL)))
-                                      (SETF OMETA::X OMETA::V)
+                                      (SETF X OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (OMETA::OMETA-APPLY OMETA::O 'OMETA::OPRED

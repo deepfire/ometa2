@@ -27,6 +27,23 @@
   (reset-to-mark o)
   (pop-mark o))
 
+(defmethod parse-input-file ((parser ometa::ometa) (file-name string))
+    (ometa::init-memo)
+    (let ((input (with-open-file (file file-name :direction :input)
+             (let ((s (make-array (file-length file))))
+               (read-sequence s file)
+               s))))
+        (let ((input-stream (make-instance 'ometa:ometa-input-stream :input-array input)))
+          (setf (input-stream parser) input-stream)
+          (ometa-apply parser 'grammar nil)
+          )))
+
+(defmethod parse-input-string ((parser ometa::ometa) (input string))
+    (ometa::init-memo)
+    (let ((input-stream (make-instance 'ometa:ometa-input-stream :input-array input)))
+      (setf (input-stream parser) input-stream)
+      (ometa-apply parser 'grammar nil)
+      ))
 
 (defclass ometa-list-input-stream () ((input-list :initarg :input-list :accessor input-list)
 				      (mark-stack :initform nil :accessor mark-stack)))
@@ -77,8 +94,8 @@
 	      result)
 	    (progn
 	      (if (not (eq (car lookup) o-fail))
-		  (setf (input-position (input-stream o)) (cdr lookup))
-		  (restore-input o))
+              (setf (input-position (input-stream o)) (cdr lookup))
+              (restore-input o))
 	      (discard-input o)
 	      (car lookup))))
       (progn
@@ -164,7 +181,7 @@
 (defmethod seq ((o ometa-prim) xs)
   (save-input o)
   (loop for x in xs
-       when (o-fail? (ometa-apply o 'exactly (list x)))
+       when (o-fail? (ometa-apply o 'ometa::exactly (list x)))
        do (progn
 	    (restore-and-discard-input o)
 	    (return-from seq o-fail)))
@@ -190,12 +207,12 @@
       (read-next (input-stream o))))
 
 (defmethod form ((o ometa-prim) arg)
-  (let ((v (ometa-apply o 'anything nil)))
+  (let ((v (ometa-apply o 'ometa::anything nil)))
     (if (or (o-fail? v)
 	    (not (listp v)))
 	o-fail
 	(let ((saved-input-stream (input-stream o)))
-	  (setf (input-stream o) (make-instance 'ometa-list-input-stream :input-list v))
+	  (setf (input-stream o) (make-instance 'ometa::ometa-list-input-stream :input-list v))
 	  (let ((result (ometa-apply o (first arg) nil)))
 	    (if (or (o-fail? result)
 		    (not (at-end-p (input-stream o))))
@@ -218,7 +235,7 @@
   (save-input o)
   (let ((str (first arg)))
     (loop for c across str
-	 when (o-fail? (ometa-apply o 'exactly (list c)))
+	 when (o-fail? (ometa-apply o 'ometa::exactly (list c)))
 	 do (progn
 		(restore-and-discard-input o)
 		(return-from token o-fail)))
@@ -226,7 +243,7 @@
     str))
 
 (defmethod stringquote ((o ometa-prim) arg)
-  (ometa-apply o 'token (list (coerce (list #\")  'string))))
+  (ometa-apply o 'ometa::token (list (coerce (list #\")  'string))))
 
 (defmethod firstAndRest ((o ometa-prim) args)
   (save-input o)
@@ -237,7 +254,7 @@
 	  (progn
 	    (restore-and-discard-input o)
 	    o-fail)
-	  (let ((result1 (ometa-apply o 'omany rest)))
+	  (let ((result1 (ometa-apply o 'ometa::omany rest)))
 	    (progn
 	      (discard-input o)
 	      (cons result result1)))))))
@@ -248,11 +265,10 @@
 	 (first-rule (ometa-apply o thing nil)))
     (if (o-fail? first-rule)
 	nil
-	(let ((others (ometa-apply o 'omany #'(lambda (o arg)
+	(let ((others (ometa-apply o 'ometa::omany #'(lambda (o arg)
 						(ometa-apply o 'oand (list #'(lambda (o arg)
-									       (ometa-apply o 'spaces nil)
-									       (ometa-apply o 'token (list separator)))
+									       (ometa-apply o 'ometa::spaces nil)
+									       (ometa-apply o 'ometa::token (list separator)))
 									   #'(lambda (o arg)
 									       (ometa-apply o thing nil))))))))
 	  (cons first-rule others)))))
-

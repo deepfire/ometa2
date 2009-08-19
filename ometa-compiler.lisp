@@ -14,7 +14,7 @@
     ((:lookahead) `(ometa-apply o 'oNot (lambda (o nullarg) (ometa-apply o 'oNot (lambda (o nullarg) ,(ometa-compile (second form)))))))
     ((apply :apply :app) (destructuring-bind (app name . args) form
 			   `(ometa-apply o
-					 ',(if (stringp name) (intern (string-upcase name)) name)
+					 ',(if (stringp name) (intern (string-upcase name) 'ometa) name)
 					 ,(if (null args)
 					      nil
 					      `(list ,@(loop for a in args

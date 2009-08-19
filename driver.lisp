@@ -27,20 +27,24 @@
   (load-alternate-ometa))
 
 (defun parse-grammar (file-name)
-  (init-memo)
-  (let ((input (with-open-file (file file-name :direction :input)
-		 (let ((s (make-array (file-length file))))
-		   (read-sequence s file)
-		   s))))
-    (let ((o (make-instance 'ometa-parser :input-stream (make-instance 'ometa-input-stream :input-array input))))
-      (ometa-apply o 'grammar nil))))
+    (let ((ometa (make-instance 'ometa-parser)))
+        (parse-input-file ometa file-name)
+        ))
+
+(defmacro with-compiled-forms (class-name grammar-file-name action)
+  `(let ((*ometa-compiler-target* ,class-name))
+    (loop for form in (mapcar #'ometa-compile (mapcar #'ometa-optimize (cdddr (parse-grammar ,grammar-file-name))) ) 
+        do (funcall ,action form)
+    )))
 
 (defun make-parser (class-name grammar-file-name parser-file-name )
-  (let ((*ometa-compiler-target* class-name))
     (with-open-file (stream parser-file-name :direction :output :if-exists :supersede)
-      (loop for form in (mapcar #'ometa-compile (mapcar #'ometa-optimize (cdddr (parse-grammar grammar-file-name))) ) 
-	 do (progn
-	      (format stream "~%")
-	      (let ((*print-readably* t))
-		(prin1 form stream)))))))
+        (with-compiled-forms class-name grammar-file-name 
+            #'(lambda (form) 
+                (format stream "~%") 
+                (let ((*print-readably* t))
+                    (prin1 form stream)))
+                    )))
 
+(defun load-grammar (class-name grammar-file-name)
+    (with-compiled-forms class-name grammar-filename #'eval))
