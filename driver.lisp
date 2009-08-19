@@ -47,4 +47,4 @@
                     )))
 
 (defun load-grammar (class-name grammar-file-name)
-    (with-compiled-forms class-name grammar-filename #'eval))
+    (with-compiled-forms class-name grammar-file-name #'eval))
