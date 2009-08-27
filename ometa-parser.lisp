@@ -1,22 +1,30 @@
+
 (DEFMETHOD OMETA::NAMEFIRST ((OMETA::O OMETA:OMETA-PARSER) OMETA::ARG)
            (LET ()
-             (OMETA::OMETA-APPLY OMETA::O 'OMETA::LETTER NIL)))
-
+             (OMETA::OMETA-APPLY OMETA::O 'OMETA::OOR
+                                 (LIST
+                                  (LAMBDA (OMETA::O OMETA::NULLARG)
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA:LETTER
+                                                        NIL))
+                                  (LAMBDA (OMETA::O OMETA::NULLARG)
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA:EXACTLY
+                                                        (LIST #\_)))))))
 (DEFMETHOD OMETA::NAMEREST ((OMETA::O OMETA:OMETA-PARSER) OMETA::ARG)
            (LET ()
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OOR
                                  (LIST
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::NAMEFIRST NIL))
+                                    (OMETA::OMETA-APPLY OMETA::O
+                                                        'OMETA::NAMEFIRST NIL))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::DIGIT NIL))
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA:DIGIT
+                                                        NIL))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (OMETA::OMETA-APPLY OMETA::O 'OMETA:EXACTLY
                                                         (LIST #\-)))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (OMETA::OMETA-APPLY OMETA::O 'OMETA:EXACTLY
                                                         (LIST #\!)))))))
-
 (DEFMETHOD OMETA::TSNAME ((OMETA::O OMETA:OMETA-PARSER) OMETA::ARG)
            (LET (XS)
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
@@ -28,30 +36,30 @@
                                                                (LIST
                                                                 "nameFirst"
                                                                 "nameRest"))))
-                                      (SETF XS OMETA::V)
+                                      (SETF OMETA::XS OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (COERCE XS 'STRING))))))
-
 (DEFMETHOD OMETA::NAME ((OMETA::O OMETA:OMETA-PARSER) OMETA::ARG)
            (LET ()
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
                                  (LIST
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::SPACES NIL))
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA:SPACES
+                                                        NIL))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (OMETA::OMETA-APPLY OMETA::O 'OMETA::TSNAME
                                                         NIL))))))
 (DEFMETHOD OMETA::TSSTRING ((OMETA::O OMETA:OMETA-PARSER) OMETA::ARG)
            (LET ()
-             (OMETA::OMETA-APPLY OMETA::O 'OMETA::TOKEN (LIST "FAIL"))))
+             (OMETA::OMETA-APPLY OMETA::O 'OMETA:TOKEN (LIST "FAIL"))))
 (DEFMETHOD OMETA::OKEYWORD ((OMETA::O OMETA:OMETA-PARSER) OMETA::ARG)
            (LET (XS)
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
                                  (LIST
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (LET ((OMETA::V (POP OMETA::ARG)))
-                                      (SETF XS OMETA::V)
+                                      (SETF OMETA::XS OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
@@ -60,8 +68,9 @@
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
-                                                            OMETA::O 'OMETA::TOKEN
-                                                            (LIST XS)))
+                                                            OMETA::O
+                                                            'OMETA:TOKEN
+                                                            (LIST OMETA::XS)))
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
@@ -77,13 +86,14 @@
                                                                NIL)))))))))))
 (DEFMETHOD OMETA::CHARACTERS ((OMETA::O OMETA:OMETA-PARSER) OMETA::ARG)
            (LET ()
-             (OMETA::OMETA-APPLY OMETA::O 'OMETA::TOKEN (LIST "''''"))))
+             (OMETA::OMETA-APPLY OMETA::O 'OMETA:TOKEN (LIST "''''"))))
 (DEFMETHOD OMETA::SCHARACTERS ((OMETA::O OMETA:OMETA-PARSER) OMETA::ARG)
            (LET (XS)
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
                                  (LIST
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::STRINGQUOTE
+                                    (OMETA::OMETA-APPLY OMETA::O
+                                                        'OMETA::STRINGQUOTE
                                                         NIL))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (LET ((OMETA::V
@@ -121,12 +131,13 @@
                                                                             OMETA::NULLARG)
                                                                          (OMETA::OMETA-APPLY
                                                                           OMETA::O
-                                                                          'OMETA::ANYTHING
+                                                                          'OMETA:ANYTHING
                                                                           NIL)))))))))))
-                                      (SETF XS OMETA::V)
+                                      (SETF OMETA::XS OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::STRINGQUOTE
+                                    (OMETA::OMETA-APPLY OMETA::O
+                                                        'OMETA::STRINGQUOTE
                                                         NIL))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     `(:STRING ,(COERCE XS 'STRING)))))))
@@ -135,33 +146,36 @@
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
                                  (LIST
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::SPACES NIL))
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA:SPACES
+                                                        NIL))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (OMETA::OMETA-APPLY OMETA::O 'OMETA:TOKEN
                                                         (LIST "#")))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (LET ((OMETA::V
-                                           (OMETA::OMETA-APPLY OMETA::O 'OMETA::TSNAME
+                                           (OMETA::OMETA-APPLY OMETA::O
+                                                               'OMETA::TSNAME
                                                                NIL)))
-                                      (SETF S OMETA::V)
+                                      (SETF OMETA::S OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    `(:APP OMETA::EXACTLY (:SYMBOL ,S)))))))
+                                    `(:APP EXACTLY (:SYMBOL ,S)))))))
 (DEFMETHOD OMETA::CHAR-LITERAL ((OMETA::O OMETA:OMETA-PARSER) OMETA::ARG)
            (LET (D)
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
                                  (LIST
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::TOKEN
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA:TOKEN
                                                         (LIST "$")))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (LET ((OMETA::V
                                            (OMETA::OMETA-APPLY OMETA::O
-                                                               'OMETA::ANYTHING NIL)))
-                                      (SETF D OMETA::V)
+                                                               'OMETA:ANYTHING
+                                                               NIL)))
+                                      (SETF OMETA::D OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    `(:APP OMETA::EXACTLY (:CHARACTER ,D)))))))
+                                    `(:APP EXACTLY (:CHARACTER ,D)))))))
 (DEFMETHOD OMETA::ONUMBER ((OMETA::O OMETA:OMETA-PARSER) OMETA::ARG)
            (LET (DS SIGN)
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
@@ -183,7 +197,7 @@
                                                                          OMETA::NULLARG)
                                                                       (OMETA::OMETA-APPLY
                                                                        OMETA::O
-                                                                       'OMETA::TOKEN
+                                                                       'OMETA:TOKEN
                                                                        (LIST
                                                                         "-"))))))
                                                                 (LAMBDA
@@ -204,7 +218,7 @@
                                                                         (OMETA::O
                                                                          OMETA::NULLARG)
                                                                       ""))))))))
-                                      (SETF SIGN OMETA::V)
+                                      (SETF OMETA::SIGN OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (LET ((OMETA::V
@@ -215,21 +229,22 @@
                                                                     OMETA::NULLARG)
                                                                  (OMETA::OMETA-APPLY
                                                                   OMETA::O
-                                                                  'OMETA::DIGIT
+                                                                  'OMETA:DIGIT
                                                                   NIL)))))
-                                      (SETF DS OMETA::V)
+                                      (SETF OMETA::DS OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    `(:APP OMETA::EXACTLY
+                                    `(:APP EXACTLY
                                       ,(PARSE-INTEGER (COERCE DS 'STRING))))))))
 (DEFMETHOD OMETA::LETTERORDIGIT ((OMETA::O OMETA:OMETA-PARSER) OMETA::ARG)
            (LET ()
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OOR
                                  (LIST
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::LETTER NIL))
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA:LETTER
+                                                        NIL))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::DIGIT
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA:DIGIT
                                                         NIL))))))
 (DEFMETHOD OMETA::ARGS ((OMETA::O OMETA:OMETA-PARSER) OMETA::ARG)
            (LET (XS)
@@ -243,7 +258,7 @@
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
                                                             OMETA::O
-                                                            'OMETA::EXACTLY
+                                                            'OMETA:EXACTLY
                                                             (LIST #\()))
                                                          (LAMBDA
                                                              (OMETA::O
@@ -255,14 +270,15 @@
                                                                    (LIST
                                                                     "hostExpr"
                                                                     ","))))
-                                                             (SETF XS OMETA::V)
+                                                             (SETF OMETA::XS
+                                                                     OMETA::V)
                                                              OMETA::V))
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
                                                             OMETA::O
-                                                            'OMETA::EXACTLY
+                                                            'OMETA:EXACTLY
                                                             (LIST #\))))
                                                          (LAMBDA
                                                              (OMETA::O
@@ -275,8 +291,8 @@
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
-                                                            OMETA::O 'OMETA::EMPTY
-                                                            NIL))
+                                                            OMETA::O
+                                                            'OMETA::EMPTY NIL))
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
@@ -286,18 +302,21 @@
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
                                  (LIST
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::SPACES NIL))
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA:SPACES
+                                                        NIL))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (LET ((OMETA::V
-                                           (OMETA::OMETA-APPLY OMETA::O 'OMETA::NAME
+                                           (OMETA::OMETA-APPLY OMETA::O
+                                                               'OMETA::NAME
                                                                NIL)))
-                                      (SETF RULE OMETA::V)
+                                      (SETF OMETA::RULE OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (LET ((OMETA::V
-                                           (OMETA::OMETA-APPLY OMETA::O 'OMETA::ARGS
+                                           (OMETA::OMETA-APPLY OMETA::O
+                                                               'OMETA::ARGS
                                                                NIL)))
-                                      (SETF AS OMETA::V)
+                                      (SETF OMETA::AS OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     `(:APP ,RULE ,@AS))))))
@@ -306,7 +325,8 @@
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
                                  (LIST
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::SPACES NIL))
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA:SPACES
+                                                        NIL))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (OMETA::OMETA-APPLY OMETA::O 'OMETA::OOR
                                                         (LIST
@@ -329,9 +349,10 @@
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
                                  (LIST
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::SPACES NIL))
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA:SPACES
+                                                        NIL))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::TOKEN
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA:TOKEN
                                                         (LIST "<<")))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (LET ((OMETA::V
@@ -362,7 +383,7 @@
                                                                                OMETA::NULLARG)
                                                                             (OMETA::OMETA-APPLY
                                                                              OMETA::O
-                                                                             'OMETA::TOKEN
+                                                                             'OMETA:TOKEN
                                                                              (LIST
                                                                               ">>")))))
                                                                        (LAMBDA
@@ -370,12 +391,12 @@
                                                                             OMETA::NULLARG)
                                                                          (OMETA::OMETA-APPLY
                                                                           OMETA::O
-                                                                          'OMETA::ANYTHING
+                                                                          'OMETA:ANYTHING
                                                                           NIL)))))))))))
-                                      (SETF XS OMETA::V)
+                                      (SETF OMETA::XS OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::TOKEN
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA:TOKEN
                                                         (LIST ">>")))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     `(:ACT ,(COERCE XS 'STRING)))))))
@@ -416,7 +437,7 @@
                                                                        OMETA::O
                                                                        'OMETA::NAME
                                                                        NIL)))))))))
-                                      (SETF X OMETA::V)
+                                      (SETF OMETA::X OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG) X)))))
 (DEFMETHOD OMETA::SEMACTION ((OMETA::O OMETA:OMETA-PARSER) OMETA::ARG)
@@ -424,7 +445,8 @@
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
                                  (LIST
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::SPACES NIL))
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA:SPACES
+                                                        NIL))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (OMETA::OMETA-APPLY OMETA::O 'OMETA::OOR
                                                         (LIST
@@ -433,17 +455,18 @@
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
                                                             OMETA::O
-                                                            'OMETA::TOKEN
+                                                            'OMETA:TOKEN
                                                             (LIST "!")))
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
                                                             OMETA::O
-                                                            'OMETA::TOKEN
+                                                            'OMETA:TOKEN
                                                             (LIST "->"))))))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::SPACES NIL))
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA:SPACES
+                                                        NIL))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (OMETA::OMETA-APPLY OMETA::O 'OMETA::OOR
                                                         (LIST
@@ -462,7 +485,8 @@
                                                                        OMETA::O
                                                                        'OMETA::ATOMICHOSTEXPR
                                                                        NIL)))
-                                                                 (SETF X OMETA::V)
+                                                                 (SETF OMETA::X
+                                                                         OMETA::V)
                                                                  OMETA::V))
                                                              (LAMBDA
                                                                  (OMETA::O
@@ -480,7 +504,8 @@
                                                                   OMETA::NULLARG)
                                                                (OMETA::OMETA-APPLY
                                                                 OMETA::O
-                                                                'OMETA::SPACES NIL))
+                                                                'OMETA:SPACES
+                                                                NIL))
                                                              (LAMBDA
                                                                  (OMETA::O
                                                                   OMETA::NULLARG)
@@ -489,7 +514,8 @@
                                                                        OMETA::O
                                                                        'OMETA::CURLYHOSTEXPR
                                                                        NIL)))
-                                                                 (SETF X OMETA::V)
+                                                                 (SETF OMETA::X
+                                                                         OMETA::V)
                                                                  OMETA::V))
                                                              (LAMBDA
                                                                  (OMETA::O
@@ -500,15 +526,17 @@
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
                                  (LIST
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::SPACES NIL))
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA:SPACES
+                                                        NIL))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::TOKEN
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA:TOKEN
                                                         (LIST "?")))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (LET ((OMETA::V
                                            (OMETA::OMETA-APPLY OMETA::O
-                                                               'OMETA::HOSTEXPR NIL)))
-                                      (SETF X OMETA::V)
+                                                               'OMETA::HOSTEXPR
+                                                               NIL)))
+                                      (SETF OMETA::X OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     `(:PRED ,X))))))
@@ -518,10 +546,11 @@
                                  (LIST
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (LET ((OMETA::V
-                                           (OMETA::OMETA-APPLY OMETA::O 'OMETA::LISTOF
+                                           (OMETA::OMETA-APPLY OMETA::O
+                                                               'OMETA::LISTOF
                                                                (LIST "expr4"
                                                                      "|"))))
-                                      (SETF XS OMETA::V)
+                                      (SETF OMETA::XS OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     `(:OR ,@XS))))))
@@ -552,7 +581,7 @@
                                                                             OMETA::NULLARG)
                                                                          (OMETA::OMETA-APPLY
                                                                           OMETA::O
-                                                                          'OMETA::SPACES
+                                                                          'OMETA:SPACES
                                                                           NIL))
                                                                        (LAMBDA
                                                                            (OMETA::O
@@ -561,7 +590,7 @@
                                                                           OMETA::O
                                                                           'OMETA::EXPR3
                                                                           NIL)))))))))))
-                                      (SETF XS OMETA::V)
+                                      (SETF OMETA::XS OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     `(:AND ,@XS))))))
@@ -571,7 +600,7 @@
                                  (LIST
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (LET ((OMETA::V (POP OMETA::ARG)))
-                                      (SETF X OMETA::V)
+                                      (SETF OMETA::X OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (OMETA::OMETA-APPLY OMETA::O 'OMETA::OOR
@@ -588,7 +617,7 @@
                                                                   OMETA::NULLARG)
                                                                (OMETA::OMETA-APPLY
                                                                 OMETA::O
-                                                                'OMETA::TOKEN
+                                                                'OMETA:TOKEN
                                                                 (LIST "*")))
                                                              (LAMBDA
                                                                  (OMETA::O
@@ -606,7 +635,7 @@
                                                                   OMETA::NULLARG)
                                                                (OMETA::OMETA-APPLY
                                                                 OMETA::O
-                                                                'OMETA::TOKEN
+                                                                'OMETA:TOKEN
                                                                 (LIST "+")))
                                                              (LAMBDA
                                                                  (OMETA::O
@@ -623,7 +652,8 @@
                                                                  (OMETA::O
                                                                   OMETA::NULLARG)
                                                                (OMETA::OMETA-APPLY
-                                                                OMETA::O 'OMETA::EMPTY
+                                                                OMETA::O
+                                                                'OMETA::EMPTY
                                                                 NIL))
                                                              (LAMBDA
                                                                  (OMETA::O
@@ -642,8 +672,10 @@
                                                            (LET ((OMETA::V
                                                                   (OMETA::OMETA-APPLY
                                                                    OMETA::O
-                                                                   'OMETA::EXPR2 NIL)))
-                                                             (SETF X OMETA::V)
+                                                                   'OMETA::EXPR2
+                                                                   NIL)))
+                                                             (SETF OMETA::X
+                                                                     OMETA::V)
                                                              OMETA::V))
                                                          (LAMBDA
                                                              (OMETA::O
@@ -652,8 +684,10 @@
                                                                   (OMETA::OMETA-APPLY
                                                                    OMETA::O
                                                                    'OMETA::OPTITER
-                                                                   (LIST X))))
-                                                             (SETF X OMETA::V)
+                                                                   (LIST
+                                                                    OMETA::X))))
+                                                             (SETF OMETA::X
+                                                                     OMETA::V)
                                                              OMETA::V))
                                                          (LAMBDA
                                                              (OMETA::O
@@ -674,7 +708,7 @@
                                                                       OMETA::NULLARG)
                                                                    (OMETA::OMETA-APPLY
                                                                     OMETA::O
-                                                                    'OMETA::TOKEN
+                                                                    'OMETA:TOKEN
                                                                     (LIST
                                                                      ":")))
                                                                  (LAMBDA
@@ -685,7 +719,8 @@
                                                                            OMETA::O
                                                                            'OMETA::NAME
                                                                            NIL)))
-                                                                     (SETF N OMETA::V)
+                                                                     (SETF OMETA::N
+                                                                             OMETA::V)
                                                                      OMETA::V))
                                                                  (LAMBDA
                                                                      (OMETA::O
@@ -693,8 +728,8 @@
                                                                    (PROGN
                                                                     (PUSHNEW
                                                                      (INTERN N)
-                                                                     (OMETA::LOCALS
-                                                                      OMETA::O))
+                                                                     (LOCALS
+                                                                      O))
                                                                     `(:SET ,N
                                                                       ,X))))))
                                                              (LAMBDA
@@ -722,14 +757,14 @@
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
-                                                            OMETA::O 'OMETA::SPACES
-                                                            NIL))
+                                                            OMETA::O
+                                                            'OMETA:SPACES NIL))
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
                                                             OMETA::O
-                                                            'OMETA::TOKEN
+                                                            'OMETA:TOKEN
                                                             (LIST ":")))
                                                          (LAMBDA
                                                              (OMETA::O
@@ -737,16 +772,18 @@
                                                            (LET ((OMETA::V
                                                                   (OMETA::OMETA-APPLY
                                                                    OMETA::O
-                                                                   'OMETA::NAME NIL)))
-                                                             (SETF N OMETA::V)
+                                                                   'OMETA::NAME
+                                                                   NIL)))
+                                                             (SETF OMETA::N
+                                                                     OMETA::V)
                                                              OMETA::V))
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (PROGN
                                                             (PUSHNEW (INTERN N)
-                                                                     (OMETA::LOCALS
-                                                                      OMETA::O))
+                                                                     (LOCALS
+                                                                      O))
                                                             `(:SET ,N
                                                               (:LOADARG)))))))))))
 (DEFMETHOD OMETA::EXPR2 ((OMETA::O OMETA:OMETA-PARSER) OMETA::ARG)
@@ -760,14 +797,14 @@
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
-                                                            OMETA::O 'OMETA::SPACES
-                                                            NIL))
+                                                            OMETA::O
+                                                            'OMETA:SPACES NIL))
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
                                                             OMETA::O
-                                                            'OMETA::TOKEN
+                                                            'OMETA:TOKEN
                                                             (LIST "~")))
                                                          (LAMBDA
                                                              (OMETA::O
@@ -775,8 +812,10 @@
                                                            (LET ((OMETA::V
                                                                   (OMETA::OMETA-APPLY
                                                                    OMETA::O
-                                                                   'OMETA::EXPR2 NIL)))
-                                                             (SETF X OMETA::V)
+                                                                   'OMETA::EXPR2
+                                                                   NIL)))
+                                                             (SETF OMETA::X
+                                                                     OMETA::V)
                                                              OMETA::V))
                                                          (LAMBDA
                                                              (OMETA::O
@@ -789,14 +828,14 @@
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
-                                                            OMETA::O 'OMETA::SPACES
-                                                            NIL))
+                                                            OMETA::O
+                                                            'OMETA:SPACES NIL))
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
                                                             OMETA::O
-                                                            'OMETA::TOKEN
+                                                            'OMETA:TOKEN
                                                             (LIST "&")))
                                                          (LAMBDA
                                                              (OMETA::O
@@ -804,8 +843,10 @@
                                                            (LET ((OMETA::V
                                                                   (OMETA::OMETA-APPLY
                                                                    OMETA::O
-                                                                   'OMETA::EXPR1 NIL)))
-                                                             (SETF X OMETA::V)
+                                                                   'OMETA::EXPR1
+                                                                   NIL)))
+                                                             (SETF OMETA::X
+                                                                     OMETA::V)
                                                              OMETA::V))
                                                          (LAMBDA
                                                              (OMETA::O
@@ -819,13 +860,15 @@
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OOR
                                  (LIST
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::APPLICATION
+                                    (OMETA::OMETA-APPLY OMETA::O
+                                                        'OMETA::APPLICATION
                                                         NIL))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::SEMACTION
-                                                        NIL))
+                                    (OMETA::OMETA-APPLY OMETA::O
+                                                        'OMETA::SEMACTION NIL))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::SEMPRED NIL))
+                                    (OMETA::OMETA-APPLY OMETA::O
+                                                        'OMETA::SEMPRED NIL))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
                                                         (LIST
@@ -897,12 +940,13 @@
                                                                            'OMETA::OKEYWORD
                                                                            (LIST
                                                                             "false"))))))))))
-                                                             (SETF X OMETA::V)
+                                                             (SETF OMETA::X
+                                                                     OMETA::V)
                                                              OMETA::V))
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
-                                                           `(:APP 'OMETA::EXACTLY
+                                                           `(:APP 'EXACTLY
                                                              ,X)))))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
@@ -911,8 +955,8 @@
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
-                                                            OMETA::O 'OMETA::SPACES
-                                                            NIL))
+                                                            OMETA::O
+                                                            'OMETA:SPACES NIL))
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
@@ -942,12 +986,13 @@
                                                                            OMETA::O
                                                                            'OMETA::SCHARACTERS
                                                                            NIL)))
-                                                                     (SETF S OMETA::V)
+                                                                     (SETF OMETA::S
+                                                                             OMETA::V)
                                                                      OMETA::V))
                                                                  (LAMBDA
                                                                      (OMETA::O
                                                                       OMETA::NULLARG)
-                                                                   `(:APP OMETA::TOKEN
+                                                                   `(:APP TOKEN
                                                                      ,S)))))
                                                              (LAMBDA
                                                                  (OMETA::O
@@ -961,7 +1006,8 @@
                                                                   OMETA::NULLARG)
                                                                (OMETA::OMETA-APPLY
                                                                 OMETA::O
-                                                                'OMETA::OSYMBOL NIL))
+                                                                'OMETA::OSYMBOL
+                                                                NIL))
                                                              (LAMBDA
                                                                  (OMETA::O
                                                                   OMETA::NULLARG)
@@ -976,21 +1022,21 @@
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
-                                                            OMETA::O 'OMETA::SPACES
-                                                            NIL))
+                                                            OMETA::O
+                                                            'OMETA:SPACES NIL))
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
                                                             OMETA::O
-                                                            'OMETA::TOKEN
+                                                            'OMETA:TOKEN
                                                             (LIST "[")))
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
-                                                            OMETA::O 'OMETA::SPACES
-                                                            NIL))
+                                                            OMETA::O
+                                                            'OMETA:SPACES NIL))
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
@@ -999,14 +1045,15 @@
                                                                    OMETA::O
                                                                    'OMETA::EXPRALL
                                                                    NIL)))
-                                                             (SETF FORMEXPR OMETA::V)
+                                                             (SETF OMETA::FORMEXPR
+                                                                     OMETA::V)
                                                              OMETA::V))
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
-                                                            OMETA::O 'OMETA::SPACES
-                                                            NIL))
+                                                            OMETA::O
+                                                            'OMETA:SPACES NIL))
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
@@ -1025,7 +1072,7 @@
                                                                      OMETA::NULLARG)
                                                                   (OMETA::OMETA-APPLY
                                                                    OMETA::O
-                                                                   'OMETA::TOKEN
+                                                                   'OMETA:TOKEN
                                                                    (LIST "/")))
                                                                 (LAMBDA
                                                                     (OMETA::O
@@ -1035,20 +1082,21 @@
                                                                           OMETA::O
                                                                           'OMETA::EXPRALL
                                                                           NIL)))
-                                                                    (SETF TAILEXPR OMETA::V)
+                                                                    (SETF OMETA::TAILEXPR
+                                                                            OMETA::V)
                                                                     OMETA::V)))))))
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
-                                                            OMETA::O 'OMETA::SPACES
-                                                            NIL))
+                                                            OMETA::O
+                                                            'OMETA:SPACES NIL))
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
                                                             OMETA::O
-                                                            'OMETA::TOKEN
+                                                            'OMETA:TOKEN
                                                             (LIST "]")))
                                                          (LAMBDA
                                                              (OMETA::O
@@ -1062,42 +1110,44 @@
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
-                                                            OMETA::O 'OMETA::SPACES
-                                                            NIL))
+                                                            OMETA::O
+                                                            'OMETA:SPACES NIL))
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
                                                             OMETA::O
-                                                            'OMETA::TOKEN
+                                                            'OMETA:TOKEN
                                                             (LIST "(")))
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
-                                                            OMETA::O 'OMETA::SPACES
-                                                            NIL))
+                                                            OMETA::O
+                                                            'OMETA:SPACES NIL))
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (LET ((OMETA::V
                                                                   (OMETA::OMETA-APPLY
                                                                    OMETA::O
-                                                                   'OMETA::EXPR NIL)))
-                                                             (SETF X OMETA::V)
+                                                                   'OMETA::EXPR
+                                                                   NIL)))
+                                                             (SETF OMETA::X
+                                                                     OMETA::V)
                                                              OMETA::V))
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
-                                                            OMETA::O 'OMETA::SPACES
-                                                            NIL))
+                                                            OMETA::O
+                                                            'OMETA:SPACES NIL))
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
                                                             OMETA::O
-                                                            'OMETA::TOKEN
+                                                            'OMETA:TOKEN
                                                             (LIST ")")))
                                                          (LAMBDA
                                                              (OMETA::O
@@ -1109,9 +1159,10 @@
                                  (LIST
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (LET ((OMETA::V
-                                           (OMETA::OMETA-APPLY OMETA::O 'OMETA::EXPR
+                                           (OMETA::OMETA-APPLY OMETA::O
+                                                               'OMETA::EXPR
                                                                NIL)))
-                                      (SETF X OMETA::V)
+                                      (SETF OMETA::X OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (PROGN
@@ -1123,7 +1174,8 @@
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OOR
                                  (LIST
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::NAME NIL))
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::NAME
+                                                        NIL))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
                                                         (LIST
@@ -1131,13 +1183,14 @@
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
-                                                            OMETA::O 'OMETA::SPACES
-                                                            NIL))
+                                                            OMETA::O
+                                                            'OMETA:SPACES NIL))
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
-                                                            OMETA::O 'OMETA::TSSTRING
+                                                            OMETA::O
+                                                            'OMETA::TSSTRING
                                                             NIL)))))))))
 (DEFMETHOD OMETA::RULE ((OMETA::O OMETA:OMETA-PARSER) OMETA::ARG)
            (LET (XS X N)
@@ -1173,16 +1226,19 @@
                                                                              OMETA::O
                                                                              'OMETA::RULENAME
                                                                              NIL)))
-                                                                       (SETF N OMETA::V)
+                                                                       (SETF OMETA::N
+                                                                               OMETA::V)
                                                                        OMETA::V))))))))))))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::SPACES NIL))
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA:SPACES
+                                                        NIL))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (LET ((OMETA::V
                                            (OMETA::OMETA-APPLY OMETA::O
                                                                'OMETA::RULEPART
-                                                               (LIST N))))
-                                      (SETF X OMETA::V)
+                                                               (LIST
+                                                                OMETA::N))))
+                                      (SETF OMETA::X OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (LET ((OMETA::V
@@ -1207,7 +1263,7 @@
                                                                             OMETA::NULLARG)
                                                                          (OMETA::OMETA-APPLY
                                                                           OMETA::O
-                                                                          'OMETA::TOKEN
+                                                                          'OMETA:TOKEN
                                                                           (LIST
                                                                            ",")))
                                                                        (LAMBDA
@@ -1215,7 +1271,7 @@
                                                                             OMETA::NULLARG)
                                                                          (OMETA::OMETA-APPLY
                                                                           OMETA::O
-                                                                          'OMETA::SPACES
+                                                                          'OMETA:SPACES
                                                                           NIL))
                                                                        (LAMBDA
                                                                            (OMETA::O
@@ -1223,20 +1279,21 @@
                                                                          (OMETA::OMETA-APPLY
                                                                           OMETA::O
                                                                           'OMETA::RULEPART
-                                                                          (LIST N))))))))))))
-                                      (SETF XS OMETA::V)
+                                                                          (LIST
+                                                                           OMETA::N))))))))))))
+                                      (SETF OMETA::XS OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (PROG1
-                                        `(:RULE ,N ,(OMETA::LOCALS OMETA::O) (:OR ,X ,@XS))
-                                      (SETF (OMETA::LOCALS OMETA::O) NIL)))))))
+                                        `(:RULE ,N ,(LOCALS O) (:OR ,X ,@XS))
+                                      (SETF (LOCALS O) NIL)))))))
 (DEFMETHOD OMETA::RULEPART ((OMETA::O OMETA:OMETA-PARSER) OMETA::ARG)
            (LET (B2 B1 N RN)
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
                                  (LIST
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (LET ((OMETA::V (POP OMETA::ARG)))
-                                      (SETF RN OMETA::V)
+                                      (SETF OMETA::RN OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
@@ -1249,7 +1306,8 @@
                                                                    OMETA::O
                                                                    'OMETA::RULENAME
                                                                    NIL)))
-                                                             (SETF N OMETA::V)
+                                                             (SETF OMETA::N
+                                                                     OMETA::V)
                                                              OMETA::V))
                                                          (LAMBDA
                                                              (OMETA::O
@@ -1262,16 +1320,18 @@
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (OMETA::OMETA-APPLY
-                                                            OMETA::O 'OMETA::SPACES
-                                                            NIL))
+                                                            OMETA::O
+                                                            'OMETA:SPACES NIL))
                                                          (LAMBDA
                                                              (OMETA::O
                                                               OMETA::NULLARG)
                                                            (LET ((OMETA::V
                                                                   (OMETA::OMETA-APPLY
                                                                    OMETA::O
-                                                                   'OMETA::EXPR4 NIL)))
-                                                             (SETF B1 OMETA::V)
+                                                                   'OMETA::EXPR4
+                                                                   NIL)))
+                                                             (SETF OMETA::B1
+                                                                     OMETA::V)
                                                              OMETA::V))
                                                          (LAMBDA
                                                              (OMETA::O
@@ -1292,14 +1352,14 @@
                                                                       OMETA::NULLARG)
                                                                    (OMETA::OMETA-APPLY
                                                                     OMETA::O
-                                                                    'OMETA::SPACES
+                                                                    'OMETA:SPACES
                                                                     NIL))
                                                                  (LAMBDA
                                                                      (OMETA::O
                                                                       OMETA::NULLARG)
                                                                    (OMETA::OMETA-APPLY
                                                                     OMETA::O
-                                                                    'OMETA::TOKEN
+                                                                    'OMETA:TOKEN
                                                                     (LIST
                                                                      "=")))
                                                                  (LAMBDA
@@ -1307,7 +1367,7 @@
                                                                       OMETA::NULLARG)
                                                                    (OMETA::OMETA-APPLY
                                                                     OMETA::O
-                                                                    'OMETA::SPACES
+                                                                    'OMETA:SPACES
                                                                     NIL))
                                                                  (LAMBDA
                                                                      (OMETA::O
@@ -1317,7 +1377,8 @@
                                                                            OMETA::O
                                                                            'OMETA::EXPR
                                                                            NIL)))
-                                                                     (SETF B2 OMETA::V)
+                                                                     (SETF OMETA::B2
+                                                                             OMETA::V)
                                                                      OMETA::V))
                                                                  (LAMBDA
                                                                      (OMETA::O
@@ -1347,18 +1408,22 @@
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
                                  (LIST
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::OKEYWORD
+                                    (OMETA::OMETA-APPLY OMETA::O
+                                                        'OMETA::OKEYWORD
                                                         (LIST "ometa")))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::SPACES NIL))
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA:SPACES
+                                                        NIL))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (LET ((OMETA::V
-                                           (OMETA::OMETA-APPLY OMETA::O 'OMETA::NAME
+                                           (OMETA::OMETA-APPLY OMETA::O
+                                                               'OMETA::NAME
                                                                NIL)))
-                                      (SETF N OMETA::V)
+                                      (SETF OMETA::N OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::SPACES NIL))
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA:SPACES
+                                                        NIL))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (LET ((OMETA::V
                                            (OMETA::OMETA-APPLY OMETA::O
@@ -1376,7 +1441,7 @@
                                                                          OMETA::NULLARG)
                                                                       (OMETA::OMETA-APPLY
                                                                        OMETA::O
-                                                                       'OMETA::TOKEN
+                                                                       'OMETA:TOKEN
                                                                        (LIST
                                                                         "<:")))
                                                                     (LAMBDA
@@ -1404,24 +1469,27 @@
                                                                         (OMETA::O
                                                                          OMETA::NULLARG)
                                                                       "OMeta"))))))))
-                                      (SETF SN OMETA::V)
+                                      (SETF OMETA::SN OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::SPACES NIL))
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA:SPACES
+                                                        NIL))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::TOKEN
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA:TOKEN
                                                         (LIST "{")))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     (LET ((OMETA::V
-                                           (OMETA::OMETA-APPLY OMETA::O 'OMETA::LISTOF
+                                           (OMETA::OMETA-APPLY OMETA::O
+                                                               'OMETA::LISTOF
                                                                (LIST "rule"
                                                                      ","))))
-                                      (SETF RS OMETA::V)
+                                      (SETF OMETA::RS OMETA::V)
                                       OMETA::V))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::SPACES NIL))
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA:SPACES
+                                                        NIL))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
-                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA::TOKEN
+                                    (OMETA::OMETA-APPLY OMETA::O 'OMETA:TOKEN
                                                         (LIST "}")))
                                   (LAMBDA (OMETA::O OMETA::NULLARG)
                                     `(:GRAMMAR ,N ,SN ,@RS))))))
