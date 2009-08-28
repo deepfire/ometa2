@@ -736,8 +736,7 @@
                                                                     (PUSHNEW
                                                                      (INTERN
                                                                       OMETA::N)
-                                                                     (OMETA::LOCALS
-                                                                      OMETA::O))
+                                                                      O))
                                                                     `(:SET
                                                                       ,OMETA::N
                                                                       ,OMETA::X))))))
@@ -1303,7 +1302,6 @@
                                         `(:RULE ,OMETA::N
                                           ,(OMETA::LOCALS OMETA::O)
                                           (:OR ,OMETA::X ,@OMETA::XS))
-                                      (SETF (OMETA::LOCALS OMETA::O) NIL)))))))
 (DEFMETHOD OMETA::RULEPART ((OMETA::O OMETA:OMETA-PARSER) OMETA::ARG)
            (LET (OMETA::B2 OMETA::B1 OMETA::N OMETA::RN)
              (OMETA::OMETA-APPLY OMETA::O 'OMETA::OAND
