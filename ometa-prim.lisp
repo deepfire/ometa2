@@ -1,6 +1,6 @@
 (in-package :ometa)
-;(declaim (optimize (safety 3) (debug 3)))
-(declaim (optimize (speed 3) (debug 1) (safety 1)))
+(declaim (optimize (safety 3) (debug 3)))
+;; (declaim (optimize (speed 3) (debug 1) (safety 1)))
 
 (defclass ometa-input-stream () ((input-array :initarg :input-array :accessor input-array)
 				 (input-position :initform 0 :accessor input-position)
@@ -81,26 +81,83 @@
 (defun init-memo ()
   (setf *memo-table* (make-hash-table :test #'equal)))
 
+(defvar *suppress-trace* nil)
+(defvar *level* 0)
+(defvar *stack* nil)
+
+(defun trc (fn val)
+  (unless *suppress-trace*
+    (let ((str (funcall fn val)))
+      (when str
+        (write-line str))))
+  val)
+
 (defmethod ometa-apply ((o ometa-prim) fun arg)
   (save-input o)
-  (if (and (null arg)
-	   (symbolp fun))
-      (let* ((key (list fun (input-position (input-stream o)) arg ))
-	     (lookup (gethash key *memo-table* :memo-lookup-failure)))
-	(if (eq lookup :memo-lookup-failure)
-	    (let ((result (funcall fun o arg)))
-	      (setf (gethash key *memo-table*) (cons result (input-position (input-stream o))))
-	      (discard-input o)
-	      result)
-	    (progn
-	      (if (not (eq (car lookup) o-fail))
-              (setf (input-position (input-stream o)) (cdr lookup))
-              (restore-input o))
-	      (discard-input o)
-	      (car lookup))))
-      (progn
-	(discard-input o)
-	(funcall fun o arg) )))
+  (labels ((choose-clamp (x)
+             (loop :for n :from 49 :above 8 :by 5
+                :if (> x n)
+                :do (return (max 7 (- x n)))
+                :finally (return nil)))
+           (unstackablep (x)
+             (or (functionp  x)
+                 (eq 'oor    x)
+                 (eq 'oand   x)
+                 (eq 'omany1 x)
+                 (eq 'omany  x))))
+    (unless *suppress-trace*
+      (unless (functionp fun)
+        (let ((cleared-fun (if (functionp fun) "<fn>" fun))
+              (cleared-arg (if (listp arg)
+                               (if (every #'functionp arg)
+                                   "..<fn>.."
+                                   (substitute-if "<fn>" #'functionp arg))
+                               (if (functionp arg) "<fn>" arg))))
+          (format t "..>>..# ~A || apply ~S ~S~%"
+                  (let* ((stk (reverse *stack*))
+                         (clamp (choose-clamp (length stk))))
+                    (if clamp (last stk clamp) stk))
+                  cleared-fun
+                  cleared-arg))))
+    (trc (lambda (res &aux (failp (and (consp res) (eq (car res) 'o-fail-object))))
+           (unless (functionp fun)
+             (let ((cleared-fun (if (functionp fun) "<fn>" fun))
+                   (cleared-arg (if (listp arg)
+                                    (if (every #'functionp arg)
+                                        "..<fn>.."
+                                        (substitute-if "<fn>" #'functionp arg))
+                                    (if (functionp arg) "<fn>" arg))))
+               (format nil "~:[OKAY  ~;FAIL!!~]# ~A || apply ~S ~S => ~:[-.-.-.-.- ~A --> ~S~;<==== FAIL~]"
+                       failp
+                       (let* ((stk (reverse *stack*))
+                              (clamp (choose-clamp (length stk))))
+                         (if clamp (last stk clamp) stk))
+                       cleared-fun
+                       cleared-arg
+                       failp
+                       cleared-fun
+                       res))))
+         (let ((*level* (1+ *level*))
+               (*stack* (unless *suppress-trace*
+                          (if (unstackablep fun) *stack* (cons fun *stack*)))))
+           (if (and (null arg)
+                    (symbolp fun))
+               (let* ((key (list fun (input-position (input-stream o)) arg ))
+                      (lookup (gethash key *memo-table* :memo-lookup-failure)))
+                 (if (eq lookup :memo-lookup-failure)
+                     (let ((result (funcall fun o arg)))
+                       (setf (gethash key *memo-table*) (cons result (input-position (input-stream o))))
+                       (discard-input o)
+                       result)
+                     (progn
+                       (if (not (eq (car lookup) o-fail))
+                           (setf (input-position (input-stream o)) (cdr lookup))
+                           (restore-input o))
+                       (discard-input o)
+                       (car lookup))))
+               (progn
+                 (discard-input o)
+                 (funcall fun o arg) ))))))
 
 
 (defun inspect-memo ()
