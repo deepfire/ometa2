@@ -82,14 +82,20 @@
   (setf *memo-table* (make-hash-table :test #'equal)))
 
 (defvar *suppress-trace* nil)
+(defvar *ignore-count* nil)
 (defvar *level* 0)
 (defvar *stack* nil)
 
 (defun trc (fn val)
-  (unless *suppress-trace*
+  (unless (or *suppress-trace*
+              (and *ignore-count*
+                   (plusp *ignore-count*)))
     (let ((str (funcall fn val)))
       (when str
         (write-line str))))
+  (when (and *ignore-count*
+             (plusp *ignore-count*))
+    (decf *ignore-count*))
   val)
 
 (defmethod ometa-apply ((o ometa-prim) fun arg)
@@ -105,7 +111,9 @@
                  (eq 'oand   x)
                  (eq 'omany1 x)
                  (eq 'omany  x))))
-    (unless *suppress-trace*
+    (unless (or *suppress-trace*
+                (and *ignore-count*
+                     (plusp *ignore-count*)))
       (unless (functionp fun)
         (let ((cleared-fun (if (functionp fun) "<fn>" fun))
               (cleared-arg (if (listp arg)
