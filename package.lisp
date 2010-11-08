@@ -24,6 +24,7 @@
    #:*trace*
    #:*ignore-count*
    #:*enable-trace-p*
+   #:*call-nr*
    ;; hooks
    #:*token-hooks*
    #:with-token-hooks

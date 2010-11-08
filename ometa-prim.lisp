@@ -33,6 +33,7 @@
 (defvar *token-hooks* nil)
 (defvar *hashed-token-hooks* nil)
 (defvar *stack* nil)
+(defvar *call-nr* nil)
 
 (defun invoke-with-parser-environment (fn)
   (let ((*hashed-token-hooks* (when *token-hooks*
@@ -41,8 +42,10 @@
                                     (setf (gethash (car cons) table) (cdr cons)))
                                   table)))
         (*stack* nil)
-        (*trace* *trace*))
-    (funcall fn)))
+        (*trace* *trace*)
+        (*call-nr* 0))
+    (values (funcall fn)
+            *call-nr*)))
 
 (defmacro with-parser-environment (() &body body)
   `(invoke-with-parser-environment (lambda () ,@body)))
@@ -155,6 +158,7 @@
                    (when (and *ignore-count*
                               (plusp *ignore-count*))
                      (decf *ignore-count*))
+                   (incf *call-nr*)
                    result)))))
     (save-input o)
     (invoke-tracing-call-and-result
