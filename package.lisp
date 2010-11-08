@@ -1,5 +1,27 @@
 (defpackage #:ometa
   (:use :cl)
-  (:export :ometa :ometa-parser :ometa-compiler :parse-grammar :make-parser :ometa-input-stream :load-grammar :parse-input-file
-    :parse-input-string :letter :digit :anything :exactly :ochar :ospace :spaces :token))
+  (:export
+   #:ometa
+   #:ometa-parser
+   #:ometa-compiler
+   #:parse-grammar
+   #:make-parser
+   #:ometa-input-stream
+   #:load-grammar
+   ;; parser invocation
+   #:parse-input-file
+   #:parse-input-string
+   ;; parsers
+   #:letter
+   #:digit
+   #:anything
+   #:exactly
+   #:ochar
+   #:ospace
+   #:spaces
+   #:token
+   ;; trace control
+   #:*suppress-trace*
+   #:*ignore-count*
+   ))
 
