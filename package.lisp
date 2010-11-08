@@ -24,5 +24,8 @@
    #:*trace*
    #:*ignore-count*
    #:*enable-trace-p*
+   ;; hooks
+   #:*token-hooks*
+   #:with-token-hooks
    ))
 
