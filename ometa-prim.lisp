@@ -81,8 +81,9 @@
 (defun init-memo ()
   (setf *memo-table* (make-hash-table :test #'equal)))
 
-(defvar *suppress-trace* nil)
+(defvar *trace* nil)
 (defvar *ignore-count* nil)
+(defvar *enable-trace-p* nil)
 (defvar *level* 0)
 (defvar *stack* nil)
 
@@ -95,25 +96,30 @@
                                     :do (return (max 7 (- stacklen n)))
                                     :finally (return nil))))
                (if only-n-tail (last stack only-n-tail) stack)))
+           (tracep ()
+             (and (or *trace*
+                      (and *ignore-count*
+                           (not (plusp *ignore-count*))))
+                  (not (functionp fun))))
            (invoke-tracing-call-and-result (fn)
-             (let* ((tracep (not (or *suppress-trace*
-                                     (and *ignore-count*
-                                          (plusp *ignore-count*))
-                                     (functionp fun))))
+             (let* ((tracep (tracep))
                     (pretty-args (when tracep
                                    (let ((args (if (listp arg) arg (list arg))))
                                      (if (every #'functionp args)
                                          "..<fn>.."
                                          (substitute-if "<fn>" #'functionp args)))))
-                    (call-stack-worthy-p (not (or (functionp  fun)
+                    (call-stack-worthy-p (not (or (functionp fun)
                                                   (member fun '(oor oand omany1 omany onot))))))
                (when tracep 
                  (format t "..>>..# ~A || apply ~S ~S~%" (stack-top) fun pretty-args))
                (let ((*level* (1+ *level*))
-                     (*stack* (unless *suppress-trace*
-                                (if call-stack-worthy-p *stack* (cons fun *stack*)))))
-                 (let ((result (funcall fn)))
-                   (when tracep
+                     (*stack* (when *trace*
+                                (if call-stack-worthy-p (cons fun *stack*) *stack*))))
+                 (let* ((result (funcall fn)))
+                   (when *enable-trace-p*
+                     (setf *trace* (or *trace*
+                                       (funcall *enable-trace-p* result))))
+                   (when (tracep)
                      (let ((failp (and (consp result) (eq (car result) 'o-fail-object))))
                        (format t "~:[OKAY  ~;FAIL!!~]# ~A || apply ~S ~S => ~:[-.-.-.-.- ~A --> ~S~;<=== FAIL~]~%"
                                failp (stack-top) fun pretty-args failp fun result)))

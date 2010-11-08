@@ -21,7 +21,8 @@
    #:spaces
    #:token
    ;; trace control
-   #:*suppress-trace*
+   #:*trace*
    #:*ignore-count*
+   #:*enable-trace-p*
    ))
 
