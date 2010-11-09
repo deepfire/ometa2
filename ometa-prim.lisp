@@ -30,20 +30,14 @@
 (defvar *trace* nil)
 (defvar *ignore-count* nil)
 (defvar *enable-trace-p* nil)
-(defvar *token-hooks* nil)
-(defvar *hashed-token-hooks* nil)
 (defvar *stack* nil)
 (defvar *call-nr* nil)
 
 (defun invoke-with-parser-environment (fn)
-  (let ((*hashed-token-hooks* (when *token-hooks*
-                                (let ((table (make-hash-table :test 'eq)))
-                                  (dolist (cons *token-hooks*)
-                                    (setf (gethash (car cons) table) (cdr cons)))
-                                  table)))
-        (*stack* nil)
+  (let ((*stack* nil)
         (*trace* *trace*)
         (*call-nr* 0))
+    (ometa::init-memo)
     (values (funcall fn)
             *call-nr*)))
 
@@ -51,30 +45,20 @@
   `(invoke-with-parser-environment (lambda () ,@body)))
 
 (defmethod parse-input-file ((parser ometa::ometa) (file-name string))
-    (ometa::init-memo)
     (with-parser-environment ()
-      (let ((input (with-open-file (file file-name :direction :input)
-                     (let ((s (make-array (file-length file))))
-                       (read-sequence s file)
-                       s))))
-        (let ((input-stream (make-instance 'ometa:ometa-input-stream :input-array input)))
-          (setf (input-stream parser) input-stream)
-          (ometa-apply parser 'grammar nil)))))
+      (let* ((input (with-open-file (file file-name :direction :input)
+                      (let ((s (make-array (file-length file))))
+                        (read-sequence s file)
+                        s)))
+             (input-stream (make-instance 'ometa:ometa-input-stream :input-array input)))
+        (setf (input-stream parser) input-stream)
+        (ometa-apply parser 'grammar nil))))
 
 (defmethod parse-input-string ((parser ometa::ometa) (input string))
-    (ometa::init-memo)
     (with-parser-environment ()
       (let ((input-stream (make-instance 'ometa:ometa-input-stream :input-array input)))
         (setf (input-stream parser) input-stream)
         (ometa-apply parser 'grammar nil))))
-
-(defmacro with-token-hooks (hooks &body body)
-  `(let ((*token-hooks* (list* ,@(loop :for (type (tokenvar resultvar) . body) :in hooks
-                                    :collect `(cons ',type ,`(lambda (,tokenvar ,resultvar)
-                                                               (declare (ignorable ,tokenvar ,resultvar))
-                                                               ,@body)))
-                               *token-hooks*)))
-     ,@body))
 
 (defclass ometa-list-input-stream () ((input-list :initarg :input-list :accessor input-list)
 				      (mark-stack :initform nil :accessor mark-stack)))
@@ -112,6 +96,10 @@
 (defun init-memo ()
   (setf *memo-table* (make-hash-table :test #'equal)))
 
+(defgeneric token-success-hook (parser token result start-pos end-pos)
+  (:method ((o ometa) token result start-pos end-pos)
+    (declare (ignore token result start-pos end-pos))))
+
 (defmethod ometa-apply ((o ometa-prim) fun arg)
   (labels ((stack-top ()
              (let* ((stack (reverse *stack*))
@@ -126,11 +114,6 @@
                       (and *ignore-count*
                            (not (plusp *ignore-count*))))
                   (not (functionp fun))))
-           (check-and-maybe-run-token-hook (token result)
-             (when *token-hooks*
-               (let ((token-hook (gethash token *hashed-token-hooks*)))
-                 (when token-hook
-                   (funcall token-hook token result)))))
            (invoke-tracing-call-and-result (fn)
              (let* ((tracep (tracep))
                     (pretty-args (when tracep
@@ -144,14 +127,15 @@
                  (format t "..>>..# ~A || apply ~S ~S~%" (stack-top) fun pretty-args))
                (let ((*stack* (when *trace*
                                 (if call-stack-worthy-p (cons fun *stack*) *stack*))))
-                 (let* ((result (funcall fn)))
+                 (let ((before-position (input-position (input-stream o)))
+                       (result (funcall fn)))
                    (when *enable-trace-p*
                      (setf *trace* (or *trace*
                                        (funcall *enable-trace-p* result))))
                    (let ((failp (and (consp result) (eq (car result) 'o-fail-object))))
                      (when (and (not failp)
                                 (symbolp fun))
-                       (check-and-maybe-run-token-hook fun result))
+                       (token-success-hook o fun result before-position (input-position (input-stream o))))
                      (when (tracep)
                        (format t "~:[OKAY  ~;FAIL!!~]# ~A || apply ~S ~S => ~:[-.-.-.-.- ~A --> ~S~;<=== FAIL~]~%"
                                failp (stack-top) fun pretty-args failp fun result)))

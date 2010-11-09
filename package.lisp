@@ -26,7 +26,6 @@
    #:*enable-trace-p*
    #:*call-nr*
    ;; hooks
-   #:*token-hooks*
-   #:with-token-hooks
+   #:token-success-hook
    ))
 
