@@ -7,6 +7,7 @@
    #:parse-grammar
    #:make-parser
    #:ometa-input-stream
+   #:input-region
    #:load-grammar
    ;; parser invocation
    #:parse-input-file

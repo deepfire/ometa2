@@ -91,6 +91,10 @@
 (defun o-fail? (x)
   (eq x o-fail))
 
+(defgeneric input-region (parser start end)
+  (:method ((o ometa) start end)
+    (subseq (input-array (input-stream o)) start end)))
+
 (defvar *memo-table*)
 
 (defun init-memo ()
