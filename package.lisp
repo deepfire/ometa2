@@ -8,10 +8,14 @@
    #:parse-grammar
    #:make-parser
    #:ometa-input-stream
+   #:input-position
+   #:input-stream
    #:input-region
    #:load-grammar
    ;; lexical category support
-   #:*posn*
+   #:*start*
+   #:*end*
+   #:*range*
    #:ometa-apply
    ;; parser invocation
    #:parse-input-file
