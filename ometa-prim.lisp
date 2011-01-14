@@ -4,11 +4,13 @@
 
 (defclass ometa-input-stream () ((input-array :initarg :input-array :accessor input-array)
 				 (input-position :initform 0 :accessor input-position)
+                                 (max-input-position :initform 0 :accessor max-input-position)
 				 (mark-stack :initform nil :accessor mark-stack)))
 
 (defmethod read-next ((o ometa-input-stream))
   (let ((v (aref (input-array o) (input-position o))))
     (incf (the fixnum (input-position o)))
+    (setf (max-input-position o) (the fixnum (max (the fixnum (max-input-position o)) (the fixnum (input-position o)))))
     v))
 
 (defmethod at-end-p ((o ometa-input-stream))
@@ -38,8 +40,7 @@
         (*trace* *trace*)
         (*call-nr* 0))
     (ometa::init-memo)
-    (values (funcall fn)
-            *call-nr*)))
+    (multiple-value-call #'values (funcall fn) *call-nr*)))
 
 (defmacro with-parser-environment (() &body body)
   `(invoke-with-parser-environment (lambda () ,@body)))
@@ -52,13 +53,13 @@
                         s)))
              (input-stream (make-instance 'ometa:ometa-input-stream :input-array input)))
         (setf (input-stream parser) input-stream)
-        (ometa-apply parser 'grammar nil))))
+        (values (ometa-apply parser 'grammar nil) (max-input-position input-stream)))))
 
 (defmethod parse-input-string ((parser ometa::ometa) (input string))
     (with-parser-environment ()
       (let ((input-stream (make-instance 'ometa:ometa-input-stream :input-array input)))
         (setf (input-stream parser) input-stream)
-        (ometa-apply parser 'grammar nil))))
+        (values (ometa-apply parser 'grammar nil) (max-input-position input-stream)))))
 
 (defclass ometa-list-input-stream () ((input-list :initarg :input-list :accessor input-list)
 				      (mark-stack :initform nil :accessor mark-stack)))
